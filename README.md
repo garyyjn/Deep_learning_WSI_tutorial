@@ -6,6 +6,8 @@ This repository is designed to provide an in-depth introduction to deep learning
 
 The notebook walkthrough uses a toy dataset made up of four TCGA WSI files. All TCGA .svs slide files can be downloaded from the TCGA data portal https://portal.gdc.cancer.gov/. The four used for this notebook are:
 
+test
+
 WSIs/
 
 .../MSI-H/
