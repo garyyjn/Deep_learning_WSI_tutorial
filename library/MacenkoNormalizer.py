@@ -161,8 +161,8 @@ class MacenkoNormalizerCuda(object):
         minPhi = cp.percentile(phi, alpha)
         maxPhi = cp.percentile(phi, 100 - alpha)
 
-        vMin = eigvecs[:, 1:3].dot(np.array([(cp.cos(minPhi), cp.sin(minPhi))]).T)
-        vMax = eigvecs[:, 1:3].dot(np.array([(cp.cos(maxPhi), cp.sin(maxPhi))]).T)
+        vMin = eigvecs[:, 1:3].dot(cp.array([(cp.cos(minPhi), cp.sin(minPhi))]).T)
+        vMax = eigvecs[:, 1:3].dot(cp.array([(cp.cos(maxPhi), cp.sin(maxPhi))]).T)
         # a heuristic to make the vector corresponding to hematoxylin first and the
         # one corresponding to eosin second
         if vMin[0] > vMax[0]:
@@ -224,8 +224,8 @@ class MacenkoNormalizerCuda(object):
         minPhi = cp.percentile(phi, alpha)
         maxPhi = cp.percentile(phi, 100 - alpha)
 
-        vMin = eigvecs[:, 1:3].dot(np.array([(cp.cos(minPhi), cp.sin(minPhi))]).T)
-        vMax = eigvecs[:, 1:3].dot(np.array([(cp.cos(maxPhi), cp.sin(maxPhi))]).T)
+        vMin = eigvecs[:, 1:3].dot(cp.array([(cp.cos(minPhi), cp.sin(minPhi))]).T)
+        vMax = eigvecs[:, 1:3].dot(cp.array([(cp.cos(maxPhi), cp.sin(maxPhi))]).T)
         # a heuristic to make the vector corresponding to hematoxylin first and the
         # one corresponding to eosin second
         if vMin[0] > vMax[0]:
