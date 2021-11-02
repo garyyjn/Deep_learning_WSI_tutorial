@@ -187,6 +187,8 @@ class MacenkoNormalizerCuda(object):
     def fit(self, reference_img, **kwargs):
         # reference_img = MacenkoNormalizer.standardize_brightness(reference_img)
         self.HERef, self.maxCRef = MacenkoNormalizer.get_HE_maxC(reference_img, **kwargs)
+        self.HERef = cp.asarray(self.HERef)
+        self.maxCRef = cp.asarray(self.maxCRef)
 
     def transform(self, img, get_H_E_results=False, Io=240, alpha=1, beta=0.15):
         """
@@ -212,7 +214,7 @@ class MacenkoNormalizerCuda(object):
         # reshape image
         img = img.reshape((-1, 3))
         # calculate optical density
-        OD = -cp.log((img.astype(cp.float) + 1) / Io)
+        OD = -cp.log((img.astype(float) + 1) / Io)
         # remove transparent pixels
         ODhat = OD[~cp.any(OD < beta, axis=1)]
         # compute eigenvectors
@@ -221,9 +223,14 @@ class MacenkoNormalizerCuda(object):
         # largest eigenvalues
         That = ODhat.dot(eigvecs[:, 1:3])
         phi = cp.arctan2(That[:, 1], That[:, 0])
+        #print(phi)
         minPhi = cp.percentile(phi, alpha)
         maxPhi = cp.percentile(phi, 100 - alpha)
-
+        #minphi = cp.asarray(minphi)
+        #print(minPhi)
+        #print(cp.cos(minPhi))
+        #print(cp.sin(minPhi))
+        #print(cp.array([(cp.cos(minPhi), cp.sin(minPhi))]).T)
         vMin = eigvecs[:, 1:3].dot(cp.array([(cp.cos(minPhi), cp.sin(minPhi))]).T)
         vMax = eigvecs[:, 1:3].dot(cp.array([(cp.cos(maxPhi), cp.sin(maxPhi))]).T)
         # a heuristic to make the vector corresponding to hematoxylin first and the
@@ -243,7 +250,7 @@ class MacenkoNormalizerCuda(object):
         C2 = cp.divide(C, tmp[:, cp.newaxis])
 
         # recreate the image using reference mixing matrix
-        Inorm = cp.multiply(Io, np.exp(-self.HERef.dot(C2)))
+        Inorm = cp.multiply(Io, cp.exp(-self.HERef.dot(C2)))
         Inorm[Inorm > 255] = 254
         Inorm = cp.reshape(Inorm.T, (h, w, 3)).astype(cp.uint8)
 
@@ -256,6 +263,10 @@ class MacenkoNormalizerCuda(object):
         E[E > 255] = 254
         E = cp.reshape(E.T, (h, w, 3)).astype(cp.uint8)
 
+
+        Inorm = cp.asnumpy(Inorm)
+        H = cp.asnumpy(Inorm)
+        E = cp.asnumpy(E)
         if get_H_E_results == True:
             return Inorm, H, E
         else:
